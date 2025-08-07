@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Estudiantes y Notas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Gestión de Estudiantes y Notas</h1>
+        
+        <!-- Pestañas -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="estudiantes-tab" data-bs-toggle="tab" data-bs-target="#estudiantes" type="button" role="tab">Estudiantes</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="notas-tab" data-bs-toggle="tab" data-bs-target="#notas" type="button" role="tab">Notas</button>
+            </li>
+        </ul>
+        
+        <!-- Contenido de las pestañas -->
+        <div class="tab-content p-3 border border-top-0 rounded-bottom" id="myTabContent">
+            <!-- Pestaña Estudiantes -->
+            <div class="tab-pane fade show active" id="estudiantes" role="tabpanel">
+                <div class="d-flex justify-content-between mb-3">
+                    <h2>Lista de Estudiantes</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalEstudiante">
+                        <i class="fas fa-plus"></i> Nuevo Estudiante
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Apellido</th>
+                                <th>Email</th>
+                                <th>Fecha Nac.</th>
+                                <th>Promedio</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaEstudiantes">
+                            <!-- Datos se cargarán con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Pestaña Notas -->
+            <div class="tab-pane fade" id="notas" role="tabpanel">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h2>Notas por Estudiante</h2>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-primary" id="btnNuevaNota" disabled data-bs-toggle="modal" data-bs-target="#modalNota">
+                            <i class="fas fa-plus"></i> Nueva Nota
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="selectEstudianteNotas" class="form-label">Estudiante:</label>
+                        <select id="selectEstudianteNotas" class="form-select">
+                            <option value="">Seleccione un estudiante</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="selectMateriaFiltro" class="form-label">Filtrar por materia:</label>
+                        <select id="selectMateriaFiltro" class="form-select" disabled>
+                            <option value="">Todas las materias</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button id="btnFiltrarNotas" class="btn btn-secondary" disabled>Filtrar</button>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Materia</th>
+                                <th>Nota</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaNotas">
+                            <!-- Datos se cargarán con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0">Promedio General</h5>
+                            </div>
+                            <div class="card-body">
+                                <h3 id="promedioGeneral" class="text-center">--</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Promedio por Materia</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="promediosMaterias" class="text-center">
+                                    Seleccione un estudiante y una materia
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Estudiante -->
+    <div class="modal fade" id="modalEstudiante" tabindex="-1" aria-labelledby="modalEstudianteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEstudianteLabel">Nuevo Estudiante</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formEstudiante">
+                        <input type="hidden" id="estudianteId">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" id="nombre" required onkeypress="return soloLetras(event)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" id="apellido" required onkeypress="return soloLetras(event)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento</label>
+                            <input type="date" class="form-control" id="fechaNacimiento" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarEstudiante">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Nota -->
+    <div class="modal fade" id="modalNota" tabindex="-1" aria-labelledby="modalNotaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNotaLabel">Nueva Nota</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formNota">
+                        <input type="hidden" id="notaId">
+                        <input type="hidden" id="notaEstudianteId">
+                        <div class="mb-3">
+                            <label for="selectMateria" class="form-label">Materia</label>
+                            <select class="form-select" id="selectMateria" required>
+                                <option value="">Seleccione una materia</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nota" class="form-label">Nota (0-10)</label>
+                            <input type="number" class="form-control" id="nota" min="0" max="10" step="0.1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="fechaNota" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="fechaNota" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarNota">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Confirmación -->
+<div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-labelledby="modalConfirmacionLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalConfirmacionLabel">Confirmar eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="confirmacionMensaje">
+        ¿Está seguro que desea eliminar este elemento?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    function soloLetras(e) {
+    let key = e.keyCode || e.which;
+    let tecla = String.fromCharCode(key).toLowerCase();
+    let letras = "abcdefghijklmnopqrstuvwxyzáéíóúñ ";
+    let especiales = [8, 37, 39, 46]; 
+
+    if (especiales.includes(key)) {
+        return true;
+    }
+
+    if (letras.includes(tecla)) {
+        return true;
+    } else {
+        e.preventDefault();
+        return false;
+    }
+}
+
+</script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="module" src="js/utils.js"></script>
+    <script type="module" src="js/estudiantes.js"></script>
+    <script type="module" src="js/notas.js"></script>
+    <script type="module" src="js/app.js"></script>
+</html>
